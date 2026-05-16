@@ -1,4 +1,6 @@
 # Student-Placement-Analysis-and-Prediction
+<img width="2479" height="3508" alt="Student Placement Dashboard 2026 2" src="https://github.com/user-attachments/assets/2e12256a-32ca-4172-bbbd-35489b84d7ea" />
+
 
 🚀 Student Placement Prediction System
 📊 Data Analytics | 🤖 Machine Learning | 📈 Career Intelligence
