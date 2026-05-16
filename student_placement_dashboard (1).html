@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Placement Dashboard 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e1117;
+    --surface: #161b27;
+    --surface2: #1e2535;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text1: #f0f2f6;
+    --text2: #8892a4;
+    --text3: #5a6478;
+    --blue: #4d9de0;
+    --blue-dim: rgba(77,157,224,0.15);
+    --teal: #2dbf8a;
+    --teal-dim: rgba(45,191,138,0.15);
+    --coral: #e05d44;
+    --coral-dim: rgba(224,93,68,0.15);
+    --amber: #f0a500;
+    --amber-dim: rgba(240,165,0,0.15);
+    --purple: #8b7fe8;
+    --purple-dim: rgba(139,127,232,0.15);
+    --pink: #e87fa0;
+    --pink-dim: rgba(232,127,160,0.12);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text1);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border2);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, #4d9de0, #2dbf8a);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: #fff; letter-spacing: -0.5px;
+  }
+  .header h1 { font-size: 15px; font-weight: 600; color: var(--text1); letter-spacing: -0.2px; }
+  .header-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    border-radius: 20px; background: var(--teal-dim);
+    color: var(--teal); border: 1px solid rgba(45,191,138,0.25);
+  }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .dataset-info { font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+  /* LAYOUT */
+  .main { padding: 22px 28px 32px; max-width: 1400px; margin: 0 auto; }
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--text3);
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .kpi-card:hover { border-color: var(--border2); }
+  .kpi-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 4px 0 0 4px;
+  }
+  .kpi-card.blue::before { background: var(--blue); }
+  .kpi-card.teal::before { background: var(--teal); }
+  .kpi-card.coral::before { background: var(--coral); }
+  .kpi-card.amber::before { background: var(--amber); }
+
+  .kpi-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; margin-bottom: 14px;
+  }
+  .kpi-card.blue .kpi-icon { background: var(--blue-dim); color: var(--blue); }
+  .kpi-card.teal .kpi-icon { background: var(--teal-dim); color: var(--teal); }
+  .kpi-card.coral .kpi-icon { background: var(--coral-dim); color: var(--coral); }
+  .kpi-card.amber .kpi-icon { background: var(--amber-dim); color: var(--amber); }
+
+  .kpi-label { font-size: 11px; color: var(--text2); font-weight: 500; margin-bottom: 6px; letter-spacing: 0.3px; }
+  .kpi-value { font-size: 28px; font-weight: 600; letter-spacing: -1px; line-height: 1; margin-bottom: 8px; }
+  .kpi-card.blue .kpi-value { color: var(--blue); }
+  .kpi-card.teal .kpi-value { color: var(--teal); }
+  .kpi-card.coral .kpi-value { color: var(--coral); }
+  .kpi-card.amber .kpi-value { color: var(--amber); }
+  .kpi-sub { font-size: 11px; color: var(--text3); }
+  .kpi-sub span { color: var(--teal); font-weight: 500; }
+
+  /* CHART GRID */
+  .chart-row { display: grid; gap: 14px; margin-bottom: 14px; }
+  .chart-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .chart-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .chart-row.cols-1-2 { grid-template-columns: 1fr 2fr; }
+  .chart-row.cols-2-1 { grid-template-columns: 2fr 1fr; }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    transition: border-color 0.2s;
+  }
+  .chart-card:hover { border-color: var(--border2); }
+
+  .chart-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 4px;
+  }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--text1); }
+  .chart-subtitle { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .chart-badge {
+    font-size: 10px; font-weight: 500; padding: 3px 8px;
+    border-radius: 20px; white-space: nowrap; margin-top: 2px;
+  }
+  .chart-badge.blue { background: var(--blue-dim); color: var(--blue); }
+  .chart-badge.teal { background: var(--teal-dim); color: var(--teal); }
+  .chart-badge.amber { background: var(--amber-dim); color: var(--amber); }
+  .chart-badge.coral { background: var(--coral-dim); color: var(--coral); }
+
+  .chart-legend {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-bottom: 14px; margin-top: 10px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  .chart-wrap { position: relative; }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--text3);
+    margin-top: 8px;
+  }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 6px 0 20px; }
+
+  /* SCROLL BAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo-mark">SP</div>
+    <div>
+      <h1>Student Placement Analytics 2026</h1>
+      <div class="header-sub">Placement prediction &amp; performance insights</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="dataset-info">n = 100,000 students</div>
+    <span class="badge">&#x25CF; Live Dataset</span>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- KPI CARDS -->
+  <div class="section-label">Key Metrics</div>
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-icon">&#9776;</div>
+      <div class="kpi-label">Total Students</div>
+      <div class="kpi-value">1,00,000</div>
+      <div class="kpi-sub">Across 6 branches &amp; 3 tiers</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-icon">&#10003;</div>
+      <div class="kpi-label">Placement Rate</div>
+      <div class="kpi-value">54.5%</div>
+      <div class="kpi-sub"><span>54,459</span> students placed</div>
+    </div>
+    <div class="kpi-card coral">
+      <div class="kpi-icon">&#8377;</div>
+      <div class="kpi-label">Avg Salary Package</div>
+      <div class="kpi-value">13.32 LPA</div>
+      <div class="kpi-sub">Range: 7.1 – 20.4 LPA</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-icon">&#9733;</div>
+      <div class="kpi-label">Avg CGPA (Placed)</div>
+      <div class="kpi-value">7.51</div>
+      <div class="kpi-sub">Not placed avg: <span>7.48</span></div>
+    </div>
+  </div>
+
+  <!-- ROW 1 -->
+  <div class="section-label">Placement Overview</div>
+  <div class="chart-row cols-1-2">
+
+    <!-- Doughnut: Placed vs Not Placed -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Placement Split</div>
+          <div class="chart-subtitle">Overall outcome distribution</div>
+        </div>
+        <span class="chart-badge teal">54.5% placed</span>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#2dbf8a;"></span>Placed (54,459)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#e05d44;"></span>Not Placed (45,541)</span>
+      </div>
+      <div class="chart-wrap" style="height:220px;">
+        <canvas id="doughnutChart" role="img" aria-label="Doughnut chart: 54.5% placed, 45.5% not placed">54,459 students placed, 45,541 not placed out of 100,000 total.</canvas>
+      </div>
+    </div>
+
+    <!-- Grouped Bar: Placement Rate by Branch -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Placement Rate by Branch</div>
+          <div class="chart-subtitle">% placed &amp; total student count per branch</div>
+        </div>
+        <span class="chart-badge blue">6 branches</span>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#4d9de0;"></span>Placement Rate %</span>
+        <span class="legend-item"><span class="legend-dot" style="background:rgba(77,157,224,0.2); border:1px dashed #4d9de0;"></span>Student Count (÷1000)</span>
+      </div>
+      <div class="chart-wrap" style="height:220px;">
+        <canvas id="branchBar" role="img" aria-label="Grouped bar chart of placement rate and student count by branch">CSE: 54.6% placed 34818 students; Civil: 55.2% 10021; ECE: 54.1% 14908; EEE: 54.3% 10177; IT: 54.3% 19999; Mechanical: 54.1% 10077.</canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="section-label">Skills &amp; Academic Performance</div>
+  <div class="chart-row cols-2-1">
+
+    <!-- Grouped Bar: Skills Comparison -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Skill Score Comparison — Placed vs Not Placed</div>
+          <div class="chart-subtitle">Average skill scores across placement outcomes</div>
+        </div>
+        <span class="chart-badge teal">5 skill dimensions</span>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#2dbf8a;"></span>Placed</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#e05d44;"></span>Not Placed</span>
+      </div>
+      <div class="chart-wrap" style="height:220px;">
+        <canvas id="skillsBar" role="img" aria-label="Grouped bar chart comparing skill scores for placed vs not placed students">Placed students score higher across coding (70.5 vs 69.0), aptitude (65.4 vs 64.5), communication (68.4 vs 67.5), logical reasoning (66.4 vs 65.3), and mock interview (70.5 vs 69.4).</canvas>
+      </div>
+    </div>
+
+    <!-- Bar: Backlog Impact -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Backlog Impact</div>
+          <div class="chart-subtitle">Placement rate vs backlog count</div>
+        </div>
+        <span class="chart-badge coral">High impact</span>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#e05d44;"></span>Placement %</span>
+      </div>
+      <div class="chart-wrap" style="height:220px;">
+        <canvas id="backlogChart" role="img" aria-label="Bar chart showing placement rate drops sharply with increasing backlogs">0 backlogs: 57.2%, 1: 52%, 2: 44.8%, 3: 39.8%, 4: 35.4%, 5: 33.3%, 6: 0%.</canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3 -->
+  <div class="section-label">Academic Profile &amp; Compensation</div>
+  <div class="chart-row cols-3">
+
+    <!-- Bar: CGPA vs Placement Rate -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">CGPA vs Placement Rate</div>
+          <div class="chart-subtitle">Higher CGPA → slightly better outcomes</div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#8b7fe8;"></span>Placement %</span>
+      </div>
+      <div class="chart-wrap" style="height:180px;">
+        <canvas id="cgpaChart" role="img" aria-label="Bar chart of placement rate by CGPA range">&lt;6: 53.3%, 6-7: 54.0%, 7-8: 54.5%, 8-9: 54.9%, 9-10: 55.7%.</canvas>
+      </div>
+    </div>
+
+    <!-- Horizontal Bar: Avg Salary by Branch -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Avg Salary by Branch (LPA)</div>
+          <div class="chart-subtitle">Among placed students only</div>
+        </div>
+        <span class="chart-badge amber">&#8377; LPA</span>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#f0a500;"></span>Avg salary (LPA)</span>
+      </div>
+      <div class="chart-wrap" style="height:180px;">
+        <canvas id="salaryBranch" role="img" aria-label="Horizontal bar chart of average salary by branch">IT: 13.33 LPA, EEE: 13.32, ECE: 13.31, CSE: 13.31, Mechanical: 13.31, Civil: 13.30 LPA.</canvas>
+      </div>
+    </div>
+
+    <!-- Bar: Gender & College Tier Breakdown -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Demographics Snapshot</div>
+          <div class="chart-subtitle">Gender split &amp; college tier distribution</div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#4d9de0;"></span>Male</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#e87fa0;"></span>Female</span>
+      </div>
+      <div class="chart-wrap" style="height:180px;">
+        <canvas id="demoChart" role="img" aria-label="Stacked bar chart of student distribution by college tier and gender">Tier 1: 12,105 male 8,056 female; Tier 2: 29,993 male 19,962 female; Tier 3: 17,930 male 11,954 female.</canvas>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer class="footer">
+  <span>Student Placement Prediction Dataset 2026 &mdash; 100,000 records &middot; 26 features</span>
+  <span>Dashboard generated by Claude &mdash; All figures computed from raw data</span>
+</footer>
+
+<script>
+Chart.defaults.color = '#8892a4';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 11;
+
+const gridColor = 'rgba(255,255,255,0.05)';
+const tickColor = '#5a6478';
+
+const baseOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: {
+    backgroundColor: '#1e2535',
+    borderColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    titleColor: '#f0f2f6',
+    bodyColor: '#8892a4',
+    padding: 10,
+    cornerRadius: 6,
+  }},
+};
+
+/* 1 — DOUGHNUT */
+new Chart(document.getElementById('doughnutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Placed', 'Not Placed'],
+    datasets: [{
+      data: [54459, 45541],
+      backgroundColor: ['#2dbf8a', '#e05d44'],
+      borderColor: ['#161b27', '#161b27'],
+      borderWidth: 3,
+      hoverOffset: 6,
+    }]
+  },
+  options: {
+    ...baseOpts,
+    cutout: '68%',
+    plugins: {
+      ...baseOpts.plugins,
+      tooltip: {
+        ...baseOpts.plugins.tooltip,
+        callbacks: {
+          label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString()} (${(ctx.parsed/1000).toFixed(1)}%)`,
+        }
+      }
+    }
+  }
+});
+
+/* 2 — BRANCH GROUPED BAR */
+new Chart(document.getElementById('branchBar'), {
+  type: 'bar',
+  data: {
+    labels: ['CSE', 'IT', 'ECE', 'EEE', 'Mechanical', 'Civil'],
+    datasets: [
+      {
+        label: 'Placement Rate %',
+        data: [54.6, 54.3, 54.1, 54.3, 54.1, 55.2],
+        backgroundColor: '#4d9de0',
+        borderRadius: 4,
+        yAxisID: 'y',
+      },
+      {
+        label: 'Students (000s)',
+        data: [34.8, 20.0, 14.9, 10.2, 10.1, 10.0],
+        backgroundColor: 'rgba(77,157,224,0.18)',
+        borderColor: '#4d9de0',
+        borderWidth: 1,
+        borderDash: [4,2],
+        borderRadius: 4,
+        yAxisID: 'y2',
+      }
+    ]
+  },
+  options: {
+    ...baseOpts,
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: tickColor } },
+      y: {
+        position: 'left',
+        min: 52, max: 57,
+        grid: { color: gridColor },
+        ticks: { color: tickColor, callback: v => v + '%' }
+      },
+      y2: {
+        position: 'right',
+        grid: { display: false },
+        ticks: { color: tickColor, callback: v => v + 'k' }
+      }
+    }
+  }
+});
+
+/* 3 — SKILLS COMPARISON */
+new Chart(document.getElementById('skillsBar'), {
+  type: 'bar',
+  data: {
+    labels: ['Coding', 'Aptitude', 'Communication', 'Logical Reasoning', 'Mock Interview'],
+    datasets: [
+      {
+        label: 'Placed',
+        data: [70.51, 65.42, 68.37, 66.42, 70.49],
+        backgroundColor: '#2dbf8a',
+        borderRadius: 4,
+      },
+      {
+        label: 'Not Placed',
+        data: [69.01, 64.47, 67.47, 65.34, 69.39],
+        backgroundColor: '#e05d44',
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    ...baseOpts,
+    scales: {
+      x: {
+        grid: { color: gridColor },
+        ticks: { color: tickColor, maxRotation: 0, autoSkip: false,
+          callback: (_, i) => ['Coding','Aptitude','Comm.','Logical','Mock'][i]
+        }
+      },
+      y: {
+        min: 60, max: 74,
+        grid: { color: gridColor },
+        ticks: { color: tickColor }
+      }
+    }
+  }
+});
+
+/* 4 — BACKLOG IMPACT */
+new Chart(document.getElementById('backlogChart'), {
+  type: 'bar',
+  data: {
+    labels: ['0', '1', '2', '3', '4', '5', '6'],
+    datasets: [{
+      label: 'Placement %',
+      data: [57.2, 52.0, 44.8, 39.8, 35.4, 33.3, 0],
+      backgroundColor: ctx => {
+        const v = ctx.raw;
+        if (v >= 50) return '#2dbf8a';
+        if (v >= 40) return '#f0a500';
+        return '#e05d44';
+      },
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    ...baseOpts,
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: tickColor }, title: { display: true, text: 'Backlogs', color: tickColor, font: { size: 10 } } },
+      y: {
+        min: 0, max: 65,
+        grid: { color: gridColor },
+        ticks: { color: tickColor, callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+/* 5 — CGPA vs PLACEMENT */
+new Chart(document.getElementById('cgpaChart'), {
+  type: 'bar',
+  data: {
+    labels: ['<6', '6–7', '7–8', '8–9', '9–10'],
+    datasets: [{
+      label: 'Placement %',
+      data: [53.3, 54.0, 54.5, 54.9, 55.7],
+      backgroundColor: '#8b7fe8',
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    ...baseOpts,
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: tickColor } },
+      y: {
+        min: 51, max: 57,
+        grid: { color: gridColor },
+        ticks: { color: tickColor, callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+/* 6 — SALARY BY BRANCH (horizontal) */
+new Chart(document.getElementById('salaryBranch'), {
+  type: 'bar',
+  data: {
+    labels: ['IT', 'EEE', 'ECE', 'CSE', 'Mech.', 'Civil'],
+    datasets: [{
+      label: 'Avg Salary (LPA)',
+      data: [13.33, 13.32, 13.31, 13.31, 13.31, 13.30],
+      backgroundColor: '#f0a500',
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    ...baseOpts,
+    indexAxis: 'y',
+    scales: {
+      x: {
+        min: 13.28, max: 13.36,
+        grid: { color: gridColor },
+        ticks: { color: tickColor, callback: v => v.toFixed(2) }
+      },
+      y: { grid: { color: gridColor }, ticks: { color: tickColor } }
+    }
+  }
+});
+
+/* 7 — DEMOGRAPHICS STACKED BAR */
+new Chart(document.getElementById('demoChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Tier 1', 'Tier 2', 'Tier 3'],
+    datasets: [
+      {
+        label: 'Male',
+        data: [12105, 29993, 17930],
+        backgroundColor: '#4d9de0',
+        borderRadius: 4,
+      },
+      {
+        label: 'Female',
+        data: [8056, 19962, 11954],
+        backgroundColor: '#e87fa0',
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    ...baseOpts,
+    scales: {
+      x: { stacked: true, grid: { color: gridColor }, ticks: { color: tickColor } },
+      y: {
+        stacked: true,
+        grid: { color: gridColor },
+        ticks: { color: tickColor, callback: v => (v/1000).toFixed(0) + 'k' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
